@@ -56,4 +56,14 @@ class User extends Authenticatable
     {
         return $this->role->name === 'Student'; // @phpstan-ignore-line
     }
+
+    public function answers()
+    {
+        return $this->hasMany(\App\Models\Answer::class);
+    }
+
+    public function classGroup()
+    {
+        return $this->belongsTo(ClassGroup::class);
+    }
 }

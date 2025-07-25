@@ -1,12 +1,15 @@
 <?php
 
 use App\Exports\SubjectResultsExport;
+use App\Http\Controllers\ClassGroupController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\ResultExportController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentExamController;
+use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +64,25 @@ Route::middleware(['auth', 'role:Lecturer'])->prefix('lecturer')->name('lecturer
         Route::get('/{exam}/export', [ResultExportController::class, 'export'])->name('exams.export');
     });
 
+    Route::prefix('subject')->name('subjects.')->group(function () {
+        Route::get('/', [SubjectController::class, 'index'])->name('index');
+        Route::get('/create', [SubjectController::class, 'create'])->name('create');
+        Route::post('/', [SubjectController::class, 'store'])->name('store');
+        Route::get('/{subject}/edit', [SubjectController::class, 'edit'])->name('edit');
+        Route::put('/{subject}', [SubjectController::class, 'update'])->name('update');
+        Route::delete('/{subject}', [SubjectController::class, 'destroy'])->name('destroy');
+    });
+    // Route::resource('/classes', ClassGroupController::class);
+
+    Route::get('/classes', [ClassGroupController::class, 'index'])->name('classes.index');
+    Route::get('/classes/create', [ClassGroupController::class, 'create'])->name('classes.create');
+    Route::post('/classes/store', [ClassGroupController::class, 'store'])->name('classes.store');
+    Route::get('/classes/{classGroup}/edit', [ClassGroupController::class, 'edit'])->name('classes.edit');
+    Route::put('/classes/{classGroup}', [ClassGroupController::class, 'update'])->name('classes.update');
+
+    Route::get('classes/{classGroup}/assign', [ClassGroupController::class, 'assign'])->name('classes.assign');
+    Route::post('classes/{classGroup}/assign', [ClassGroupController::class, 'assignStore'])->name('classes.assign.store');
+
     // grade
     Route::get('exams/{exam}/grade', [ExamController::class, 'grade'])->name('exams.grade');
     Route::post('answers/{answer}/grade', [ExamController::class, 'submitGrade'])->name('answers.grade');
@@ -68,8 +90,15 @@ Route::middleware(['auth', 'role:Lecturer'])->prefix('lecturer')->name('lecturer
 
 Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentController::class, 'index'])->name('dashboard');
-    Route::get('exams/{exam}', [StudentController::class, 'showExam'])->name('exam');
-    Route::post('exams/{exam}', [StudentController::class, 'submitExam'])->name('exam.submit');
+    Route::get('/result', [StudentController::class, 'allResults'])->name('result');
+
+    Route::get('/exams', [StudentExamController::class, 'index'])->name('exams.index');
+    Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.show');
+
+    Route::get('/exams/{exam}/start', [StudentExamController::class, 'start'])->name('exams.start');
+
+    Route::get('/exams/{exam}', [StudentController::class, 'showExam'])->name('exam');
+    Route::post('/exams/{exam}', [StudentController::class, 'submitExam'])->name('exam.submit');
 });
 
 Route::middleware('auth')->group(function () {

@@ -39,11 +39,10 @@ class ExamController extends Controller
         $request->validate([
             'title' => 'required',
             'subject_id' => 'required|exists:subjects,id',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
+            'duration' => 'required|integer|min:1',
         ]);
 
-        Exam::create($request->only('title', 'subject_id', 'start_time', 'end_time'));
+        Exam::create($request->only('title', 'subject_id', 'duration'));
 
         return redirect()->route('lecturer.exams.index')->with('success', 'Exam created');
     }

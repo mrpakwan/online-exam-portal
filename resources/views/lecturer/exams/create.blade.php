@@ -6,43 +6,56 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <form method="POST" action="{{ route('lecturer.exams.store') }}" class="mt-6 space-y-6">
-                        @csrf
-                        @method('post')
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow rounded-lg p-6 sm:p-8">
+                <form method="POST" action="{{ route('lecturer.exams.store') }}" class="space-y-6">
+                    @csrf
 
-                        <div>
-                            <x-input-label for="title" :value="__('Title')" />
-                            <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" :value="old('title')" required autofocus autocomplete="title" />
-                            <x-input-error class="mt-2" :messages="$errors->get('title')" />
-                        </div>
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700">{{ __('Title') }}</label>
+                        <input id="title" name="title" type="text"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            value="{{ old('title') }}" required autofocus autocomplete="title">
+                        @error('title')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <x-input-label for="subject_id" :value="__('Subject')" />
-                            <x-select id="subject_id" name="subject_id" class="mt-1 block w-full" :value="old('title')" required autofocus  :options="$optSubjects" autocomplete="subject_id" />
-                            <x-input-error class="mt-2" :messages="$errors->get('subject_id')" />
-                        </div>
+                    <div>
+                        <label for="subject_id" class="block text-sm font-medium text-gray-700">{{ __('Subject') }}</label>
+                        <select id="subject_id" name="subject_id"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            required>
+                            <option value="">-- Select Subject --</option>
+                            @foreach($optSubjects as $subject)
+                                <option value="{{ $subject['value'] }}" {{ old('subject_id') == $subject['value'] ? 'selected' : '' }}>
+                                    {{ $subject['name'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('subject_id')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <x-input-label for="start_time" :value="__('Start Time')" />
-                            <x-text-input id="start_time" name="start_time" type="datetime-local" class="mt-1 block w-full" :value="old('start_time')" required autofocus autocomplete="start_time" />
-                            <x-input-error class="mt-2" :messages="$errors->get('start_time')" />
-                        </div>
+                    <div>
+                        <label for="duration" class="block text-sm font-medium text-gray-700">{{ __('Duration') }}</label>
+                        <input id="duration" name="duration" type="text"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            value="{{ old('duration') }}" required autofocus autocomplete="duration">
+                        @error('duration')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <x-input-label for="end_time" :value="__('End Time')" />
-                            <x-text-input id="end_time" name="end_time" type="datetime-local" class="mt-1 block w-full" :value="old('end_time')" required autofocus autocomplete="end_time" />
-                            <x-input-error class="mt-2" :messages="$errors->get('end_time')" />
-                        </div>
-                        
-                        <div class="flex items-center gap-4">
-                            <x-primary-button>{{ __('Create') }}</x-primary-button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex justify-end">
+                        <button type="submit"
+                            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-blue-700 transition">
+                            {{ __('Create') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
     </div>
 </x-app-layout>

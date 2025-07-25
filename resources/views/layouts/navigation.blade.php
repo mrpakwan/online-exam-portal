@@ -19,8 +19,18 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('lecturer.classes.index')" :active="request()->routeIs('lecturer.classes.index')">
+                        {{ __('Manage Classes') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('lecturer.subjects.index')" :active="request()->routeIs('lecturer.subjects.index')">
+                        {{ __('Manage Subjects') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('lecturer.exams.index')" :active="request()->routeIs('lecturer.exams.index')">
-                        {{ __('Exam') }}
+                        {{ __('Manage Exam') }}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -43,7 +53,7 @@
 
                 @elseif(auth()->user()->isStudent())
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>

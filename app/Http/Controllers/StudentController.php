@@ -15,13 +15,51 @@ class StudentController extends Controller
         $user = Auth::user();
         $classId = $user->class_group_id;
 
-        $exams = Exam::whereHas('subject', fn ($q) => $q->where('class_group_id', $classId)
-        )
-            ->where('start_time', '<=', $now)
-            ->where('end_time', '>=', $now)
-            ->get();
+        $exams = Exam::whereHas('subject', fn ($q) => $q->where('class_group_id', $classId))->get();
 
         return view('student.dashboard', compact('exams'));
+    }
+
+    public function allResults()
+    {
+        $user = Auth::user();
+
+        // Fetch all exams the user has answered
+        $answers = $user->answers()
+            ->with(['question.options', 'question.exam'])
+            ->get()
+            ->groupBy(fn ($a) => $a->question->exam_id);
+
+        $results = [];
+
+        foreach ($answers as $examId => $examAnswers) {
+            $exam = $examAnswers->first()->question->exam;
+            $questions = $exam->questions;
+            $total = $questions->count();
+            $correct = 0;
+
+            foreach ($questions as $question) {
+                $answer = $examAnswers->firstWhere('question_id', $question->id);
+                if ($question->type === 'mcq' && $answer) {
+                    $correctOption = $question->options->firstWhere('is_correct', true);
+                    if ($correctOption && $answer->answer_text === $correctOption->option_text) {
+                        $correct++;
+                    }
+                }
+            }
+
+            $percentage = $total > 0 ? round(($correct / $total) * 100, 2) : 0;
+
+            $results[] = [
+                'exam' => $exam,
+                'total' => $total,
+                'correct' => $correct,
+                'percentage' => $percentage,
+                'submitted_at' => $examAnswers->first()->created_at,
+            ];
+        }
+
+        return view('student.results', compact('results'));
     }
 
     public function showExam(Exam $exam)
@@ -34,9 +72,12 @@ class StudentController extends Controller
     public function submitExam(Request $request, Exam $exam)
     {
         $userId = Auth::id();
+        $allQuestions = $exam->questions;
 
-        foreach ($request->answers as $questionId => $answer) {
-            $question = $exam->questions()->find($questionId);
+        $answers = $request->input('answers');
+
+        foreach ($allQuestions as $question) {
+            $answer = $answers[$question->id] ?? null;
 
             $isCorrect = null;
             if ($question->type === 'mcq') {
@@ -45,7 +86,7 @@ class StudentController extends Controller
             }
 
             Answer::updateOrCreate(
-                ['user_id' => $userId, 'question_id' => $questionId],
+                ['user_id' => $userId, 'question_id' => $question->id],
                 [
                     'answer_text' => $answer,
                     'is_correct' => $isCorrect,

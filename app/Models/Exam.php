@@ -17,4 +17,9 @@ class Exam extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function getDurationLabelAttribute()
+    {
+        return gmdate('H:i', $this->duration * 60); // e.g. "01:30"
+    }
 }
